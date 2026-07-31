@@ -19,7 +19,7 @@
 
 `微信视频号` · `视频号视频` · `上传视频到视频号` · `上传视频号视频` · `视频号上传` ·
 `发布视频到视频号` · `视频号批量上传` · `视频号自动发布` · `视频号运营工具` ·
-`视频号上传视频 Skill` · `微信视频号自动发布 Skill` ·
+`视频号上传视频 Skill` · `微信视频号自动发布 Skill` · `上传视频到视频号 Skill` · `视频号 Skill` ·
 `WeChat Channels` · `Channels Upload` · `视频号脚本` · `视频号自动化`
 
 > 在 GitHub 搜索以上任意关键词（尤其是「上传视频到视频号」「视频号上传」「微信视频号」），
@@ -42,7 +42,7 @@ wechat-channels-upload/
 ├── README.md                     # 本文件
 └── references/
     ├── playwright-env.md         # Playwright 环境配置（NODE_PATH / Chromium / 登录态）
-    ├── upload-flow.md            # 详细上传流程（7 步：上传→标题→描述→封面→原创→发表）
+    ├── upload-flow.md            # 详细上传流程（7 步：上传→标题→描述→原创→封面→发表）
     └── template-script.js        # 可直接运行的 Playwright 上传脚本模板
 ```
 
@@ -89,9 +89,9 @@ node references/template-script.js
 1. 用 `launchPersistentContext` 打开视频号发布页并复用登录态（首次需扫码）
 2. 通过 `setInputFiles` 上传视频，等待「短标题」输入框出现即上传完成
 3. 逐字 `type` 短标题；用 `keyboard.type` 填写描述与话题标签
-4. 条件性上传封面（多选择器兜底 + 等待「生成中」结束）
-5. 勾选原创声明、确认协议，并处理「广告分成」弹窗
-6. 点击「发表」完成发布
+4. 勾选原创声明、确认协议
+5. 条件性上传封面（等待封面区域就绪 → 多选择器兜底 → 等待「生成中」结束）
+6. 点击「发表」完成发布，处理「广告分成」弹窗
 
 ## 适用场景
 
@@ -109,7 +109,7 @@ A Skill for automatically **uploading videos to WeChat Channels (微信视频号
 Supports batch publishing, cover image upload, title/hashtag optimization, and original-declaration.
 
 **Keywords:** WeChat Channels upload · upload video to Channels · Channels video · 视频号上传 ·
-微信视频号 · publish to WeChat Channels · WeChat Channels automation.
+微信视频号 · 上传视频到视频号 Skill · 视频号 Skill · publish to WeChat Channels · WeChat Channels automation.
 
 ### Features
 

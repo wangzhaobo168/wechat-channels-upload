@@ -50,13 +50,48 @@ await ed.click(); await sleep(300);
 await page.keyboard.type(FULL_DESC, { delay: 20 });
 ```
 
-## Step 5: 封面上传（条件性）
+## Step 5: 声明原创
+
+```js
+// 1. 勾选原创 checkbox
+const cb = page.locator('.declare-original-checkbox .ant-checkbox-input, .declare-original-checkbox input[type="checkbox"]').first();
+await cb.click();
+await sleep(2000);
+
+// 2. 检查协议弹窗
+const proto = page.locator('.original-proto-wrapper .ant-checkbox-input, .original-proto-wrapper input[type="checkbox"]').first();
+if (await proto.isVisible({ timeout: 3000 }).catch(()=>false)) {
+  await proto.click();  // 勾选协议
+  await sleep(1000);
+  // 3. 点"声明原创"确认
+  await page.locator('button:has-text("声明原创")').first().click();
+  await sleep(2000);
+}
+```
+
+## Step 6: 封面上传（条件性，放在原创声明之后）
 
 ### 判断逻辑
 ```js
 const COVER_FILE = videoDir + '\\' + baseName + '_cover.jpg';
 const hasCover = fs.existsSync(COVER_FILE);
 if (!hasCover) { console.log('无封面图，跳过'); return; }
+```
+
+### 等待封面区域就绪（关键！）
+
+视频上传后封面区域会显示"生成中"，此时点击无法打开弹窗。必须先等待"生成中"消失：
+
+```js
+console.log('[6] 等待封面区域就绪...');
+for (let i = 0; i < 30; i++) {
+  const generating = await page.$$eval('[class*="cover"]',
+    els => els.some(el => (el.innerText||'').includes('生成中'))
+  );
+  if (!generating) { console.log('[6] 封面区域就绪'); break; }
+  await sleep(2000);
+}
+await sleep(2000);
 ```
 
 ### 打开封面弹窗 — 10+ 选择器 + 缩略图兜底
@@ -82,12 +117,12 @@ for (const s of triggers) {
   try {
     const el = page.locator(s).first();
     if (await el.isVisible({ timeout: 1000 }).catch(() => false)) {
-      console.log('[5a] 点击:', s);
+      console.log('[6a] 点击:', s);
       await el.click(); await sleep(2000);
       const dlg = page.locator('.weui-desktop-dialog__wrp:not([style*="display: none"])').first();
       if (await dlg.isVisible({ timeout: 2000 }).catch(() => false)) {
         dialogOpened = true;
-        console.log('[5a] 弹窗已打开');
+        console.log('[6a] 弹窗已打开');
       }
     }
   } catch(e) {}
@@ -160,30 +195,11 @@ await sleep(3000);
 
 // 等封面生成完成（最多60秒）
 for (let i = 0; i < 30; i++) {
-  const generating = await page.$$eval('[class*="cover"]', 
+  const generating = await page.$$eval('[class*="cover"]',
     els => els.some(el => (el.innerText||'').includes('生成中'))
   );
   if (!generating) break;
   console.log('封面生成中...');
-  await sleep(2000);
-}
-```
-
-## Step 6: 声明原创
-
-```js
-// 1. 勾选原创 checkbox
-const cb = page.locator('.declare-original-checkbox .ant-checkbox-input, .declare-original-checkbox input[type="checkbox"]').first();
-await cb.click();
-await sleep(2000);
-
-// 2. 检查协议弹窗
-const proto = page.locator('.original-proto-wrapper .ant-checkbox-input, .original-proto-wrapper input[type="checkbox"]').first();
-if (await proto.isVisible({ timeout: 3000 }).catch(()=>false)) {
-  await proto.click();  // 勾选协议
-  await sleep(1000);
-  // 3. 点"声明原创"确认
-  await page.locator('button:has-text("声明原创")').first().click();
   await sleep(2000);
 }
 ```
